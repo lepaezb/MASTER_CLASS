@@ -28,6 +28,8 @@ On your R console (bottom left pane in R studio) type in:
 install.packages("tidyverse")
 # hint enter
 
+#Ok this didn't work 
+
 ```
 Voila you should see tidyverse installing !
 You can also install each package within tidyverse seperate.
