@@ -12,12 +12,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Goal to get our essential files in order to run deseq2!
-# Oh and to learn some basic R skills towards our goals!
 The input to DESEQ2 is going to want "counts" these came from the program
 Salmon from the NF_CORE pipeline output. 
-
-# Refresher of where is my data is here:
-00_Where_is_R_data.Rmd
 
 Salmon calculates the number of reads over a gene. We also need to consider which 
 version of the gene we want. Genes come in different "isoforms" which have extra or less bits
@@ -56,7 +52,9 @@ Note that the <- sets a variable.
 # Then we will call the read.table() function that first requires a file path to the counts in quotes
 # Note that in R functions follow with () where the parameter inputs are placed.
 # Then we will call up different parameters with a comma, in this case header = TRUE, row.names =1
-counts_matrix <- read.table("/scratch/Shares/rinnclass/MASTER_CLASS/lessons/04_RNAseq_Dox/01_Mouse_dox_wt/good_class_RNAseq/pipeline_output/star_salmon/salmon.merged.gene_counts.tsv", header=TRUE, row.names=1)
+counts_matrix_nf14 <- read.table("/scratch/Shares/rinnclass/MASTER_CLASS/STUDENTS/lupa9404/MASTER_CLASS/data/mouse_wt_long_timecourse_nf3.14/salmon.merged.gene_counts.tsv", header=TRUE, row.names=1)
+
+counts_matrix_nf18 <- read.table("/scratch/Shares/rinnclass/MASTER_CLASS/STUDENTS/lupa9404/MASTER_CLASS/data/mouse_wt_long_timecourse_nf3.18/salmon.merged.gene_counts.tsv", header=TRUE, row.names=1)
 
 # Nice, now we have an object called counts_matrix in our Environment Panel (top right)
 # Let's take a look 

@@ -1,0 +1,50 @@
+---
+title: "installed_packages"
+output: html_document
+date: "2025-02-17"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Installed packages
+```{r installed packages}
+library(BiocManager)
+library(IRanges)
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(readr)
+library(ggplot2)
+library(purrr)
+library(magrittr)
+library(pheatmap)
+library(textshape)
+library(Rcpp)
+library(matrixStats)
+library(rtracklayer)
+library(tidyverse)
+library(DESeq2)
+```
+
+
+# Functions
+- `read.table("<path>",header=TRUE, row.names=1)` : reads a table (such as tsv file) in R
+- `data.frame(column1name = column1_values, column2name = column2_values)` : makes a dataframe with column names and values specified
+- `write.csv(dataframe, "<path>/name.csv")` : writes a csv file from a dataframe
+- `rownames(dataframe)` : returns the rows (meta-annotation) of a dataframe
+- `select(variableFromDataframe)`: dplyr (from tidyverse) function to refer to a variable in a daframe (such as one of its column names)
+- `as.matrix(dataframe)` : converts a dataframe into a matrix 
+- `round(matrix)` : rounds all values in a matrix
+- `rowSums(matrix)` : sums the values of a row in a matrix
+- `save(object1, object2, file="<path>/filename.RData")` : saves files into an RData file type for later retrieval.
+
+# General:
+- **salmon.merged.gene_counts.tsv**: number of reads for each gene in the sample.
+
+# To check
+- How salmon works: https://combine-lab.github.io/salmon/getting_started/
+
+
