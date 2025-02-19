@@ -11,6 +11,39 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r main}
+# Load the data from tsv files
+counts_matrix_nf14 <- read.table("/scratch/Shares/rinnclass/MASTER_CLASS/STUDENTS/lupa9404/MASTER_CLASS/data/mouse_wt_long_timecourse_nf3.14/salmon.merged.gene_counts.tsv", header=TRUE, row.names=1)
+counts_matrix_nf18 <- read.table("/scratch/Shares/rinnclass/MASTER_CLASS/STUDENTS/lupa9404/MASTER_CLASS/data/mouse_wt_long_timecourse_nf3.18/salmon.merged.gene_counts.tsv", header=TRUE, row.names=1)
+
+# Create gene to symbol (g2s) dataframe that saves gene names and annotation from metadata in rownames
+# Remember the format is: [rows, columns]. Metarows are pulled in by using rownames()
+g2s_nf14 <- data.frame(gene_id = rownames(counts_matrix_nf14), gene_symbol = counts_matrix_nf14[ , 1])
+g2s_nf18 <- data.frame(gene_id = rownames(counts_matrix_nf18), gene_symbol = counts_matrix_nf14[ , 1])
+
+# Let's save this using write.csv
+write.csv(g2s_nf14, "data/mouse_wt_long_timecourse_nf3.14/results/g2s_nf14.csv")
+write.csv(g2s_nf18, "data/mouse_wt_long_timecourse_nf3.18/results/g2s_nf18.csv")
+
+# Remove gene name column from matrix (matrices are numeric)
+counts_matrix_nf14 <- counts_matrix_nf14 %>% select(-gene_name)
+counts_matrix_nf18 <- counts_matrix_nf18 %>% select(-gene_name)
+
+# Convert datframe into a matrix and round its values
+counts_matrix_nf14 <- as.matrix(counts_matrix_nf14) 
+counts_matrix_nf18 <- as.matrix(counts_matrix_nf18) 
+counts_matrix_rounded_nf14 <- round(counts_matrix_nf14)
+counts_matrix_rounded_nf18 <- round(counts_matrix_nf18)
+
+# Filter genes with no relevant counts (less than 1 for the sum of the row)
+counts_filtered_nf14 <- counts_matrix_rounded_nf14[rowSums(counts_matrix_rounded_nf14) > 1, ]
+counts_filtered_nf18 <- counts_matrix_rounded_nf18[rowSums(counts_matrix_rounded_nf18) > 1, ]
+
+# Save progress in an .RData file
+save(counts_filtered_nf14, counts_matrix_nf14, g2s_nf14, file = "data/mouse_wt_long_timecourse_nf3.14/results/count_files.RData")
+save(counts_filtered_nf18, counts_matrix_nf18, g2s_nf18, file = "data/mouse_wt_long_timecourse_nf3.18/results/count_files.RData")
+```
+
 # Goal to get our essential files in order to run deseq2!
 The input to DESEQ2 is going to want "counts" these came from the program
 Salmon from the NF_CORE pipeline output. 
@@ -44,8 +77,6 @@ Note that the <- sets a variable.
 # Let's run our first function to get our salmon mergened gene counts in a table
 # 1) Read in and clean up counts table
 ```{r loading and cleaning up count data}
-# Let's take a look at the read.table function
-?read.table
 
 # we need to make the function write to an output object. To do so we use the 
 # <- assisgnement operator, here we are calling the salmon merged gene counts "counts_matrix"
@@ -55,10 +86,6 @@ Note that the <- sets a variable.
 counts_matrix_nf14 <- read.table("/scratch/Shares/rinnclass/MASTER_CLASS/STUDENTS/lupa9404/MASTER_CLASS/data/mouse_wt_long_timecourse_nf3.14/salmon.merged.gene_counts.tsv", header=TRUE, row.names=1)
 
 counts_matrix_nf18 <- read.table("/scratch/Shares/rinnclass/MASTER_CLASS/STUDENTS/lupa9404/MASTER_CLASS/data/mouse_wt_long_timecourse_nf3.18/salmon.merged.gene_counts.tsv", header=TRUE, row.names=1)
-
-# Nice, now we have an object called counts_matrix in our Environment Panel (top right)
-# Let's take a look 
-View(counts_matrix)
 ```
 
 # 2) Making a dataframe of gene_id and gene_name
@@ -68,15 +95,6 @@ We will use this a lot throughout our analyses.
 
 Note: that the gene_id is currently in a "meta" format so we need to move it into the table.
 To do this we will use the rownames function
-```{r create g2s object}
-
-# Creating a dataframe with gene_id and gene_symbol
-# note creating columns with name = data
-g2s <- data.frame(gene_id = rownames(counts_matrix), gene_symbol = counts_matrix[ , 1])
-
-# Let's save this using write.csv
-write.csv(g2s, "results/g2s.csv")
-```
 
 
 ```{r loading and cleaning up count data}
