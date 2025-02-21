@@ -1,5 +1,5 @@
 ---
-title: "installed_packages"
+title: "Class notes and exercises"
 output: html_document
 date: "2025-02-17"
 ---
@@ -8,9 +8,8 @@ date: "2025-02-17"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
-# Installed packages
-```{r installed packages}
+## Installed packages
+```{r installed packages, results='hide'}
 library(BiocManager)
 library(IRanges)
 library(dplyr)
@@ -30,7 +29,64 @@ library(DESeq2)
 ```
 
 
-# Functions
+## Code and class exercises
+
+### 2/19: Basics of reading and proccesing files in R
+```{r 02/19}
+# Load the data from tsv files
+counts_matrix<- read.table("/scratch/Shares/rinnclass/MASTER_CLASS/STUDENTS/lupa9404/MASTER_CLASS/rna_seq_analysis/mouse_wt_long_timecourse_nf3.14/salmon.merged.gene_counts.tsv", header=TRUE, row.names=1)
+
+# Create gene to symbol (g2s) dataframe that saves gene names and annotation from metadata in rownames
+# Remember the format is: [rows, columns]. Metarows are pulled in by using rownames()
+g2s<- data.frame(gene_id = rownames(counts_matrix), gene_symbol = counts_matrix[ , 1])
+
+# Let's save this using write.csv
+write.csv(g2s, "rna_seq_analysis/mouse_wt_long_timecourse_nf3.14/results/g2s.csv")
+
+# Remove gene name column from matrix (matrices are numeric)
+counts_matrix <- counts_matrix %>% select(-gene_name)
+
+# Convert datframe into a matrix and round its values
+counts_matrix_numerical <- as.matrix(counts_matrix) 
+counts_matrix_rounded <- round(counts_matrix_numerical)
+
+# Filter genes with no relevant counts (less than 1 for the sum of the row)
+counts_filtered <- counts_matrix_rounded[rowSums(counts_matrix_rounded) > 1, ]
+
+# Save progress in an .RData file
+save(counts_filtered, counts_matrix, g2s, file = "rna_seq_analysis/mouse_wt_long_timecourse_nf3.14/results/count_files.RData")
+```
+
+
+### 2/21: Basics of R data proccesing + prep DESeq2 data
+```{r 02/21}
+# Load environment from previous class
+load("rna_seq_analysis/mouse_wt_long_timecourse_nf3.14/results/count_files.RData")
+
+# Make a column from the titles of the columns of the counts_matrix table
+deseq_samples <- data.frame(
+  sample_id = colnames(counts_matrix))
+
+# Make a split_values variable with the split content of deseq_samples$sample_id 
+split_values <- strsplit(deseq_samples$sample_id, "_")
+
+# Make a list of the rime values and replicate values from the split_values variable
+time_values <- sapply(split_values, function(x) x[[2]])
+replicate_values <- sapply(split_values, function(x) x[[3]])
+
+# Make columns in deseq_samples table with the time values and replicate values for each sample
+deseq_samples$time_point <- time_values
+deseq_samples$replicate <- replicate_values
+
+# Factor columns with variables
+deseq_samples$time_point <- factor(deseq_samples$time_point)
+deseq_samples$replicate <- factor(deseq_samples$replicate)
+
+# 
+save(deseq_samples, counts_matrix, file = "rna_seq_analysis/mouse_wt_long_timecourse_nf3.14/results/deseq_samples.RData")
+```
+
+## Functions
 - `read.table("<path>",header=TRUE, row.names=1)` : reads a table (such as tsv file) in R
 - `data.frame(column1name = column1_values, column2name = column2_values)` : makes a dataframe with column names and values specified
 - `write.csv(dataframe, "<path>/name.csv")` : writes a csv file from a dataframe
@@ -40,11 +96,16 @@ library(DESeq2)
 - `round(matrix)` : rounds all values in a matrix
 - `rowSums(matrix)` : sums the values of a row in a matrix
 - `save(object1, object2, file="<path>/filename.RData")` : saves files into an RData file type for later retrieval.
+- `load(<path>/robject.RData)`: loads an .RData object and populates the enviroment with saved data
+- `colnames(dataframe)`: retrieves the column names from a matrix-like object
+- `strsplit(dataframe$vector_character, specification)`: Split the elements of a character vector into substrings according to the specification argument given (which is also a character).
+- `sapply(dataframe, function)`: applies the function specified to the vector or dataframe passed in the argument.
+- `factor(vector)`: encodes a vector as a factor
 
-# General:
+## General:
 - **salmon.merged.gene_counts.tsv**: number of reads for each gene in the sample.
 
-# To check
+## To check
 - How salmon works: https://combine-lab.github.io/salmon/getting_started/
 
 

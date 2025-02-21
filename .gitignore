@@ -55,4 +55,4 @@ work/*
 *fa
 *.bed
 *.gz
-
+runs/
